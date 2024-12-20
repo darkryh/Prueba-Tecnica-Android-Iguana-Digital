@@ -11,6 +11,14 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+# Dagger packages
+-keep class dagger.hilt.** { *; }
+-keep class * implements dagger.hilt.internal.GeneratedComponent { *; }
+-dontwarn dagger.hilt.**
+# Just in case viewBinding
+-keep class **.databinding.** { *; }
+-dontwarn **.databinding.**
+
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
