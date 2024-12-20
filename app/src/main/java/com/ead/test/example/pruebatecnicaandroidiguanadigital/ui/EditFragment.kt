@@ -1,6 +1,7 @@
 package com.ead.test.example.pruebatecnicaandroidiguanadigital.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,48 +17,58 @@ import dagger.hilt.android.AndroidEntryPoint
 class EditFragment : Fragment() {
 
     private var _binding: FragmentEditBinding? = null
-    private val binding get() = _binding!!
 
-    private val viewModel: ItemViewModel by activityViewModels()
+    private val viewModel: ItemViewModel by lazy {
+        try {
+            activityViewModels<ItemViewModel>().value
+        } catch (e: Exception) {
+            Log.e("error", "Error injectando ViewModel: ${e.message}")
+            throw IllegalStateException("ViewModel injeccion fallida")
+        }
+    }
 
     private var itemId: Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
         _binding = FragmentEditBinding.inflate(inflater, container, false)
-        return binding.root
+        return _binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        arguments?.let {
-            itemId = it.getInt(ITEM_ID, -1)
-            val itemName = it.getString(ITEM_NAME, "")
-            binding.editTextName.setText(itemName)
-        }
-
-        binding.editTextName.doAfterTextChanged {
-            if (it.isNullOrBlank()) {
-                binding.textInputLayout.error = "Nombre no puede estar vacio"
-            } else {
-                binding.textInputLayout.error = null
+        _binding?.let { binding ->
+            arguments?.let {
+                itemId = it.getInt(ITEM_ID, -1)
+                val itemName = it.getString(ITEM_NAME, "")
+                binding.editTextName.setText(itemName)
             }
-        }
 
-        binding.saveButton.setOnClickListener {
-            val itemName = binding.editTextName.text.toString()
-
-            if (itemName.isNotBlank()) {
-                val newItem = DataItem(id = if (itemId == -1) 0 else itemId ?: 0, name = itemName)
-                viewModel.addItem(newItem)
-
-                parentFragmentManager.popBackStack()
-            } else {
-                binding.textInputLayout.error = "Name cannot be empty"
+            binding.editTextName.doAfterTextChanged {
+                if (it.isNullOrBlank()) {
+                    binding.textInputLayout.error = "Nombre no puede estar vacío"
+                } else {
+                    binding.textInputLayout.error = null
+                }
             }
+
+            binding.saveButton.setOnClickListener {
+                val itemName = binding.editTextName.text.toString()
+
+                if (itemName.isNotBlank()) {
+                    val newItem = DataItem(id = if (itemId == -1) 0 else itemId ?: 0, name = itemName)
+                    viewModel.addItem(newItem)
+
+                    parentFragmentManager.popBackStack()
+                } else {
+                    binding.textInputLayout.error = "Nombre no puede estar vacío"
+                }
+            }
+        } ?: run {
+            Log.e("EditFragment", "Binding es null en onViewCreated")
         }
     }
 

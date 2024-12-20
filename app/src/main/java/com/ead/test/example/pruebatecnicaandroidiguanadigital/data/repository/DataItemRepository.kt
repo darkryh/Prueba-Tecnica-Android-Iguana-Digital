@@ -1,30 +1,43 @@
 package com.ead.test.example.pruebatecnicaandroidiguanadigital.data.repository
 
 import com.ead.test.example.pruebatecnicaandroidiguanadigital.data.model.DataItem
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class DataItemRepository {
 
     private val source: MutableList<DataItem> = mutableListOf()
     private var currentId = 1
 
-    fun add(dataItem: DataItem) {
-        val itemWithId = if (dataItem.id <= 0) {
-            val newId = currentId++
-            dataItem.copy(id = newId)
-        } else {
-            dataItem
-        }
-        source.add(itemWithId)
-    }
-
-    fun update(dataItem: DataItem) {
-        val index = source.indexOfFirst { it.id == dataItem.id }
-        if (index != -1) {
-            source[index] = dataItem
+    suspend fun generateTestItems() {
+        withContext(Dispatchers.IO) {
+            val largeList = List(10000) { "Item $it" }
+            largeList.forEachIndexed { index, it ->
+                source.add(DataItem(id = index, name = it))
+            }
         }
     }
 
-    fun getAll(): List<DataItem> {
-        return source
+    suspend fun add(dataItem: DataItem) {
+        withContext(Dispatchers.IO) {
+            val id = if (dataItem.id <= 0) {
+                currentId++
+            } else {
+                dataItem.id
+            }
+            source[id] = dataItem.copy(id = id)
+        }
+    }
+
+    suspend fun update(dataItem: DataItem) {
+        withContext(Dispatchers.IO) {
+            source[dataItem.id] = dataItem
+        }
+    }
+
+    suspend fun getAll(): List<DataItem> {
+        return withContext(Dispatchers.IO) {
+            source.toList()
+        }
     }
 }

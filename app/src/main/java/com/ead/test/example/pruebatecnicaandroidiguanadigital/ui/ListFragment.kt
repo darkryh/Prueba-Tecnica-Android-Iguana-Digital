@@ -1,6 +1,7 @@
 package com.ead.test.example.pruebatecnicaandroidiguanadigital.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,33 +18,43 @@ import dagger.hilt.android.AndroidEntryPoint
 class ListFragment : Fragment() {
 
     private var _binding: FragmentListBinding? = null
-    private val binding get() = _binding!!
 
-    private val viewModel: ItemViewModel by activityViewModels()
+    private val viewModel: ItemViewModel by lazy {
+        try {
+            activityViewModels<ItemViewModel>().value
+        } catch (e: Exception) {
+            Log.e("error", "Error injectando ViewModel: ${e.message}")
+            throw IllegalStateException("ViewModel injeccion fallida")
+        }
+    }
 
     private lateinit var adapter: ItemAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
         _binding = FragmentListBinding.inflate(inflater, container, false)
-        return binding.root
+        return _binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        adapter = ItemAdapter()
-        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        binding.recyclerView.adapter = adapter
+        _binding?.let { binding ->
+            adapter = ItemAdapter()
+            binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+            binding.recyclerView.adapter = adapter
 
-        viewModel.items.observe(viewLifecycleOwner) { items ->
-            adapter.submitList(items)
+            viewModel.items.observe(viewLifecycleOwner) { items ->
+                adapter.submitList(items)
+            }
+
+            adapter.setOnItemClickListener { item -> navigateToEditFragment(item.id, item.name) }
+            binding.addButton.setOnClickListener { navigateToEditFragment() }
+        } ?: run {
+            Log.e("ListFragment", "Binding is null in onViewCreated")
         }
-
-        adapter.setOnItemClickListener { item -> navigateToEditFragment(item.id, item.name) }
-        binding.addButton.setOnClickListener { navigateToEditFragment() }
     }
 
     private fun navigateToEditFragment(itemId: Int? = null, itemName: String? = null) {

@@ -30,6 +30,7 @@ class ItemAdapter : RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
         val diffResult = androidx.recyclerview.widget.DiffUtil.calculateDiff(
             DiffUtil(items, newList)
         )
+
         items.clear()
         items.addAll(newList)
         diffResult.dispatchUpdatesTo(this)
