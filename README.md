@@ -84,12 +84,17 @@ Este proyecto es una prueba técnica diseñada para evaluar habilidades en:
 android {
     buildTypes {
         debug {
-            isMinifyEnabled = false
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "1.0-Test"
+            isDebuggable = true
         }
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+            isMinifyEnabled = true // para minificar el codigo y no usado
+            isShrinkResources = true // para recursos no usados
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }
