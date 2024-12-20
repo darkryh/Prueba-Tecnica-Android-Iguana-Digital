@@ -111,3 +111,64 @@ En el análisis se identificaron los siguientes puntos clave:
 - Optimización implementada con `RecyclerView` y `DiffUtil` para mitigar el impacto en el rendimiento.
 
 > **Nota:** El análisis incluyó la generación de 10,000 elementos en modo de prueba para simular un uso intensivo.
+
+## **Optimización del Código en DataItemRepository**
+
+### **Antes de Implementar `suspend` y `Dispatchers.IO`**
+En este ejemplo, todas las operaciones de la lista se ejecutaban directamente en el hilo principal, lo que podía provocar bloqueos en la interfaz de usuario cuando se procesaban grandes cantidades de datos.
+
+```kotlin
+class DataItemRepository {
+
+    private val source: MutableList<DataItem> = mutableListOf()
+    private var currentId = 1
+
+    fun generateTestItems() {
+        val largeList = List(10000) { "Item $it" }
+        largeList.forEachIndexed { index, it ->
+            source.add(DataItem(id = index, name = it))
+        }
+    }
+
+    fun add(dataItem: DataItem) {
+        val id = if (dataItem.id <= 0) {
+            currentId++
+        } else {
+            dataItem.id
+        }
+        source[id] = dataItem.copy(id = id)
+    }
+
+    fun update(dataItem: DataItem) {
+        source[dataItem.id] = dataItem
+    }
+
+    fun getAll(): List<DataItem> {
+        return source.toList()
+    }
+}
+```
+
+### **Problemas Detectados**
+1. **Bloqueo del Hilo Principal:**
+    - Todas las operaciones intensivas, como agregar y generar grandes cantidades de datos, se ejecutaban directamente en el hilo principal.
+    - Esto causaba retrasos notables en la interfaz de usuario, afectando la experiencia del usuario.
+
+2. **Poca Escalabilidad:**
+    - El código no estaba preparado para manejar grandes cantidades de datos eficientemente.
+    - Generar listas grandes o actualizar múltiples elementos impactaba negativamente en el rendimiento.
+
+---
+
+### **Beneficios de la Optimización**
+1. **Desempeño Mejorado:**
+    - Todas las operaciones intensivas se ejecutan en el contexto `Dispatchers.IO`, evitando el bloqueo del hilo principal.
+    - La aplicación sigue siendo fluida incluso al manejar listas grandes (e.g., 10,000 elementos).
+
+2. **Escalabilidad:**
+    - Preparado para manejar cargas de trabajo más grandes sin afectar la experiencia del usuario.
+    - Uso eficiente de recursos en operaciones de entrada/salida.
+
+3. **Código Limpio y Seguro:**
+    - Uso de `suspend` garantiza que las operaciones se gestionen de forma adecuada dentro de corrutinas.
+    - Evita errores de concurrencia y optimiza la eficiencia del procesamiento de datos.
