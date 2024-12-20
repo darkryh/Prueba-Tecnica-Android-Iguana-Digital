@@ -187,4 +187,4 @@ object TestHelper {
 ```
 [Referencia: TestHelper](https://github.com/darkryh/Prueba-Tecnica-Android-Iguana-Digital/blob/master/app/src/main/java/com/ead/test/example/pruebatecnicaandroidiguanadigital/TestHelper.kt)
 
-Solamente le cambian el valor a false
+Solamente le cambian el valor a false en caso de quere testear otras opciones
