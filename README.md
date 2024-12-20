@@ -98,4 +98,16 @@ android {
         }
     }
 }
+```
 
+### **Pruebas de Rendimiento**
+
+El análisis de rendimiento se realizó utilizando el **Android Profiler**, específicamente para medir el impacto en el hilo principal al manejar listas grandes.
+
+![Profiler Analysis](assets/images/Profiler_check.png)
+
+En el análisis se identificaron los siguientes puntos clave:
+- Bloqueo del hilo principal debido a operaciones intensivas relacionadas con la manipulación de listas grandes.
+- Optimización implementada con `RecyclerView` y `DiffUtil` para mitigar el impacto en el rendimiento.
+
+> **Nota:** El análisis incluyó la generación de 10,000 elementos en modo de prueba para simular un uso intensivo.
