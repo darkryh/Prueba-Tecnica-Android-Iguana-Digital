@@ -172,3 +172,19 @@ class DataItemRepository {
 3. **Código Limpio y Seguro:**
     - Uso de `suspend` garantiza que las operaciones se gestionen de forma adecuada dentro de corrutinas.
     - Evita errores de concurrencia y optimiza la eficiencia del procesamiento de datos.
+
+## **Configuración de Modo de Prueba**
+
+La aplicación incluye un objeto de configuración llamado `TestHelper` que permite habilitar o deshabilitar la generación de 10,000 elementos para pruebas de rendimiento.
+
+### **Archivo de Configuración**
+```kotlin
+package com.ead.test.example.pruebatecnicaandroidiguanadigital
+
+object TestHelper {
+    const val IS_TESTING_ITEMS = true
+}
+
+[Referencia: TestHelper](https://github.com/darkryh/Prueba-Tecnica-Android-Iguana-Digital/blob/master/app/src/main/java/com/ead/test/example/pruebatecnicaandroidiguanadigital/TestHelper.kt)
+
+Solamente le cambian el valor a false
